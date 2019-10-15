@@ -33,3 +33,13 @@ $RECYCLE.BIN/
 .DS_Store
 Thumbs.db
 UserInterfaceState.xcuserstate
+
+platforms
+plugins
+
+.gradle
+ios
+android
+resources
+www
+src/assets/*
