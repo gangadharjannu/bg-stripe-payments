@@ -1,5 +1,8 @@
 {
   "name": "bg",
-  "integrations": {},
+  "integrations": {
+    "capacitor": {},
+    "cordova": {}
+  },
   "type": "angular"
 }
