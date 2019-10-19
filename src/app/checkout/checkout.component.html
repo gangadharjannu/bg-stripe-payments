@@ -1,0 +1,27 @@
+<form id="payment-form">
+  <div class="form-row">
+    <label for="name">
+      Name
+    </label>
+    <input id="name" name="name" placeholder="Jenny Rosen" required>
+
+    <label for="amount">
+      Amount
+    </label>
+    <input id="amount" name="amount" placeholder="amount" required>
+  </div>
+
+  <div class="form-row">
+    <label for="ideal-bank-element">
+      iDEAL Bank
+    </label>
+    <div id="ideal-bank-element">
+      <!-- A Stripe Element will be inserted here. -->
+    </div>
+  </div>
+
+  <button>Submit Payment</button>
+
+  <!-- Used to display form errors. -->
+  <div id="error-message" role="alert"></div>
+</form>
