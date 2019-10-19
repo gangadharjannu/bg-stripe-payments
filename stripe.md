@@ -33,3 +33,6 @@ We will be using Stripe elements as we have to support iDeal.
     - This will give the token that is required for making payment.
   6. Send the token received from step 5 to backend along with amount and currency to make the payment from backend.
   
+## iDeal payment integration
+
+https://stripe.com/docs/sources/ideal
