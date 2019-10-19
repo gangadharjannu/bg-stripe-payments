@@ -2,8 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { HttpService } from '../http.service';
 
-import { timer, from } from 'rxjs'
-import { map, concatMap, filter, take } from 'rxjs/operators'
+import { timer, from } from 'rxjs';
+import { concatMap, filter, take } from 'rxjs/operators';
 
 import { environment } from '../../environments/environment';
 
@@ -71,38 +71,4 @@ export class OrderConfirmationComponent implements OnInit {
       console.log(error);
     });
   }
-
-  // pollServer(source, clientSecret) {
-  //   const stripe = Stripe('pk_test_hMT1x4dp9Th9tCu7ESufTorY00XtCfvaXN');
-  //   // After some amount of time, we should stop trying to resolve the order synchronously:
-  //   var MAX_POLL_COUNT = 10;
-  //   var pollCount = 0;
-
-  //   function pollForSourceStatus() {
-  //     stripe.retrieveSource({ id: source, client_secret: clientSecret })
-  //       .then(function (result) {
-  //         var source = result.source;
-  //         if (source.status === 'chargeable') {
-  //           // Make a request to your server to charge the Source.
-  //           // Depending on the Charge status, show your customer the relevant message.
-  //           console.log('********');
-  //           console.log(result);
-  //           this.chargeCustomer({
-  //             amount: this.amount,
-  //             currency: this.currency,
-  //             source: this.sourceID
-  //           });
-  //         } else if (source.status === 'pending' && pollCount < MAX_POLL_COUNT) {
-  //           // Try again in a second, if the Source is still `pending`:
-  //           pollCount += 1;
-  //           setTimeout(pollForSourceStatus, 1000);
-  //         } else {
-  //           // Depending on the Source status, show your customer the relevant message.
-  //           console.log(result);
-  //         }
-  //       });
-  //   }
-
-  //   pollForSourceStatus();
-  // }
 }
