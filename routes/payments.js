@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
-var stripe = require('stripe');
-stripe = stripe('YOUR_SECRET_KEY');
+var { STRIPE_API_KEY } = require('../config');
+var stripe = require('stripe')(STRIPE_API_KEY);
 
 function requestPaymentFromStripe(details) {
   return new Promise(function (resolve, reject) {
@@ -20,7 +20,21 @@ function requestPaymentFromStripe(details) {
 
 }
 
-/* GET payments page. */
+function makeChargeRequest(details) {
+  return new Promise(function (resolve, reject) {
+    stripe.charges.create({
+      amount: details.body.amount,
+      currency: details.body.currency || 'eur',
+      source: details.body.source,
+    }, function (err, charge) {
+      // asynchronously called
+      if (err) {
+        reject(err);
+      }
+      resolve(charge);
+    });
+  });
+}
 router.post('/', function (req, res, next) {
   requestPaymentFromStripe(req).then(function (success) {
     res.send(success);
@@ -29,5 +43,16 @@ router.post('/', function (req, res, next) {
   });
 });
 
+router.post('/charge', function (req, res, next) {
+  makeChargeRequest(req).then(function (success) {
+    res.send(success);
+  }).catch(function (error) {
+    console.log(error);
+  });
+});
+
+router.post('/polling', function (req, res, next) {
+  res.send({ source: req.body.source + 1 });
+});
 
 module.exports = router;
