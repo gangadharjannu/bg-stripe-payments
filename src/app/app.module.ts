@@ -4,6 +4,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { IonicModule } from '@ionic/angular';
 import { SplashScreen } from '@ionic-native/splash-screen/ngx';
 import { StatusBar } from '@ionic-native/status-bar/ngx';
+import { InAppBrowser } from '@ionic-native/in-app-browser/ngx';
 import { Stripe } from '@ionic-native/stripe/ngx';
 
 import { AppComponent } from './app.component';
@@ -28,6 +29,7 @@ import { HttpService } from './http.service';
     HttpClient,
     HttpService,
     Stripe,
+    InAppBrowser, 
   ],
   bootstrap: [AppComponent]
 })
