@@ -1,7 +1,6 @@
-var express = require('express');
-var router = express.Router();
-var stripe = require('stripe');
-stripe = stripe('YOUR_SECRET_KEY');
+const express = require('express');
+const router = express.Router();
+const stripe = require('stripe')('YOUR_SECRET_KEY');
 
 function requestPaymentFromStripe(details) {
   return new Promise(function (resolve, reject) {
