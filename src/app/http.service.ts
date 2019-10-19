@@ -10,10 +10,17 @@ export class HttpService {
   constructor(private http: HttpClient) { }
 
   /**
-   * @param paymentInfo - Contains token information which will be used by 
+   * @param paymentInfo - Contains token information which will be used by
    * backend to make the actual payment
    */
   makePayment(paymentInfo): Observable<any> {
     return this.http.post('http://localhost:3000/payments', paymentInfo);
+  }
+  /**
+   * Charge the customer
+   * @param paymentInfo - Contains payment information
+   */
+  charge(paymentInfo): Observable<any> {
+    return this.http.post('http://localhost:3000/payments/charge', paymentInfo);
   }
 }
