@@ -1,8 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Platform } from '@ionic/angular';
+import { ActivatedRoute } from '@angular/router';
+
 import { SplashScreen } from '@ionic-native/splash-screen/ngx';
 import { StatusBar } from '@ionic-native/status-bar/ngx';
+import { InAppBrowser, InAppBrowserOptions } from '@ionic-native/in-app-browser/ngx';
+
 import { HttpService } from './http.service';
 
 declare var Stripe: any;
@@ -13,65 +17,115 @@ declare var Stripe: any;
   styleUrls: ['app.component.scss']
 })
 export class AppComponent implements OnInit {
+  private sourceID: string;
+  private clientSecret: string;
 
   constructor(
     private http: HttpClient,
     private httpService: HttpService,
     private platform: Platform,
     private splashScreen: SplashScreen,
-    private statusBar: StatusBar
+    private statusBar: StatusBar,
+    private iab: InAppBrowser,
+    private route: ActivatedRoute,
   ) {
     this.initializeApp();
   }
   ngOnInit() {
-    // Your Stripe public key
-    const stripe = Stripe('YOUR_SECRET_KEY');
+    // after redirection from user authorization
+    this.sourceID = this.route.snapshot.queryParamMap.get('source');
+    this.clientSecret = this.route.snapshot.queryParamMap.get('client_secret');
 
+
+    // Your Stripe public key
+    const stripe = Stripe('pk_test_hMT1x4dp9Th9tCu7ESufTorY00XtCfvaXN');
+    if (this.sourceID && this.clientSecret) {
+
+      return;
+    }
     // Create `card` element that will watch for updates
     // and display error messages
     const elements = stripe.elements();
-    const card = elements.create('card');
-    card.mount('#card-element');
-    card.addEventListener('change', event => {
-      const displayError = document.getElementById('card-errors');
-      if (event.error) {
-        displayError.textContent = event.error.message;
-      } else {
-        displayError.textContent = '';
+    // Custom styling can be passed to options when creating an Element.
+    // (Note that this demo uses a wider set of styles than the guide below.)
+    const style = {
+      base: {
+        padding: '10px 12px',
+        color: '#32325d',
+        fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
+        fontSmoothing: 'antialiased',
+        fontSize: '16px',
+        '::placeholder': {
+          color: '#aab7c4'
+        },
+      },
+      invalid: {
+        color: '#fa755a',
       }
-    });
+    };
+    // Create an instance of the idealBank Element.
+    const idealBank = elements.create('idealBank', { style: style });
+    // Add an instance of the idealBank Element into the `ideal-bank-element` <div>.
+    idealBank.mount('#ideal-bank-element');
 
-    // Listen for form submission, process the form with Stripe,
-    // and get the 
-    const paymentForm = document.getElementById('payment-form');
-    paymentForm.addEventListener('submit', event => {
+    const errorMessage = document.getElementById('error-message');
+
+    // Handle form submission.
+    const form = document.getElementById('payment-form');
+
+    form.addEventListener('submit', event => {
       event.preventDefault();
-      stripe.createToken(card).then(result => {
-        // stripe.createSource(card).then(result => {
+      // showLoading();
+
+      var sourceData = {
+        type: 'ideal',
+        // amount 5.99 euros
+        amount: 599,
+        currency: 'eur',
+        owner: {
+          name: 'bg',
+        },
+        statement_descriptor: 'TEST ORDER',
+        // Specify the URL to which the customer should be redirected
+        // after paying.
+        redirect: {
+          return_url: 'http://localhost:4200',
+        },
+      };
+
+
+      // Call `stripe.createSource` with the idealBank Element and additional options.
+      stripe.createSource(idealBank, sourceData).then(result => {
         if (result.error) {
-          console.log('Error creating payment method.');
-          const errorElement = document.getElementById('card-errors');
-          errorElement.textContent = result.error.message;
+          // Inform the customer that there was an error.
+          errorMessage.textContent = result.error.message;
+          errorMessage.classList.add('visible');
+          // stopLoading();
         } else {
-          // At this point, you should send the token ID
-          // to your server so it can attach
-          // the payment source to a customer
-          console.log('Token acquired!');
-          // amount and currency hard coded
-          const amount = 100;
-          const currency = 'eur';
-          this.chargeCustomer({
-            token: result.token.id,
-            amount: amount,
-            currency: currency,
-          });
+          // Redirect the customer to the authorization URL.
+          errorMessage.classList.remove('visible');
+          this.stripeSourceHandler(result.source);
         }
       });
     });
+
+  }
+
+  stripeSourceHandler(source: any) {
+    console.log(source);
+    const options: InAppBrowserOptions = {
+      zoom: 'no'
+    };
+    // opens new system browser window which will opens the corresponding app url
+    const ref = this.iab.create(source.redirect.url, '_system', options);
   }
 
   chargeCustomer(token: any) {
     this.httpService.makePayment(token).subscribe(res => console.log(res));
+  }
+
+  getToken(paymentInfo: any) {
+    this.httpService.getToken(paymentInfo)
   }
 
   initializeApp() {
@@ -81,4 +135,3 @@ export class AppComponent implements OnInit {
     });
   }
 }
-//
