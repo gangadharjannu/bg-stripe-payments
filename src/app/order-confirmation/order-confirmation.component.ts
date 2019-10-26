@@ -16,11 +16,13 @@ export class OrderConfirmationComponent implements OnInit {
   private sourceID: string;
   private clientSecret: string;
   private stripe;
+  private orderStatus: 'success' | 'pending' | 'failed';
   constructor(private route: ActivatedRoute, private httpService: HttpService) {
 
   }
 
   ngOnInit() {
+    this.orderStatus = 'pending';
     // Your Stripe public key
     this.stripe = Stripe(environment.stripeKey);
 
@@ -33,7 +35,6 @@ export class OrderConfirmationComponent implements OnInit {
     if (this.sourceID && this.clientSecret) {
       // implement polling to check whether the payment is chargeable
       // then send a request to backend to charge the payment
-
       timer(0, 500)
         .pipe(
           concatMap(
@@ -43,21 +44,27 @@ export class OrderConfirmationComponent implements OnInit {
           take(10),
           filter((stripeData: any) => {
             console.log(stripeData);
-            return stripeData.source.status === 'chargeable';
+            return ['failed', 'chargeable'].includes(stripeData.source.status);
           }),
           // take the first one
           take(1)
         )
         .subscribe((data) => {
-          this.httpService.charge({
-            amount: data.source.amount,
-            currency: 'eur',
-            source: data.source.id,
-          }).subscribe(success => {
-            console.log(success);
-            console.log('సమాప్తం');
-          });
-          console.log('done dona done');
+          if (data.source.status === 'chargeable') {
+            this.httpService.charge({
+              amount: data.source.amount,
+              currency: 'eur',
+              source: data.source.id,
+            }).subscribe(success => {
+              console.log(success);
+              this.orderStatus = 'success';
+              console.log('సమాప్తం');
+            });
+            console.log('done dona done');
+          } else {
+            this.orderStatus = 'failed';
+            console.log('failed');
+          }
         }, (error) => {
           console.log('service call lo edo lopam vachindi');
           console.log(error);
