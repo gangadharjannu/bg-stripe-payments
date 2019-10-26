@@ -58,6 +58,11 @@ export class OrderConfirmationComponent implements OnInit {
             console.log('సమాప్తం');
           });
           console.log('done dona done');
+        }, (error) => {
+          console.log('service call lo edo lopam vachindi');
+          console.log(error);
+        }, () => {
+          console.log('service call samaptham ayindi');
         });
       return;
     }
