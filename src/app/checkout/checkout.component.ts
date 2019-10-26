@@ -14,6 +14,7 @@ export class CheckoutComponent implements OnInit {
   private amount = 599;
   private currency = 'eur';
   private stripe;
+  private selectedBank = null;
   constructor(private iab: InAppBrowser) { }
 
   ngOnInit() {
@@ -44,18 +45,21 @@ export class CheckoutComponent implements OnInit {
     const idealBank = elements.create('idealBank', { style });
     // Add an instance of the idealBank Element into the `ideal-bank-element` <div>.
     idealBank.mount('#ideal-bank-element');
-
+    // get chosen bank name 
+    idealBank.addEventListener('change', event => this.selectedBank = event.value || null);
     const errorMessage = document.getElementById('error-message');
 
     // Handle form submission.
     const form = document.getElementById('payment-form');
-
     const sourceData = {
       type: 'ideal',
       amount: this.amount,
       currency: this.currency,
       owner: {
         name: 'bg',
+      },
+      ideal: {
+        bank: this.selectedBank,
       },
       statement_descriptor: 'TEST ORDER',
       // Provide mobile application URI scheme as the redirect[return_url] value for mobile
@@ -69,9 +73,6 @@ export class CheckoutComponent implements OnInit {
     form.addEventListener('submit', event => {
       event.preventDefault();
       // showLoading();
-
-
-
 
       // Call `stripe.createSource` with the idealBank Element and additional options.
       this.stripe.createSource(idealBank, sourceData).then(result => {
