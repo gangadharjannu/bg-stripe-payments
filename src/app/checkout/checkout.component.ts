@@ -45,7 +45,7 @@ export class CheckoutComponent implements OnInit {
     const idealBank = elements.create('idealBank', { style });
     // Add an instance of the idealBank Element into the `ideal-bank-element` <div>.
     idealBank.mount('#ideal-bank-element');
-    // get chosen bank name 
+    // get chosen bank name
     idealBank.addEventListener('change', event => this.selectedBank = event.value || null);
     const errorMessage = document.getElementById('error-message');
 
